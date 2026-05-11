@@ -75,6 +75,7 @@ Es ist **nicht nötig**, PHP, MySQL, Composer o.Ä. lokal zu installieren – al
 git clone <REPOSITORY-URL>
 cd einkaufslisten-app
 ```
+
 ### 2. Umgebungsvariablen vorbereiten (optional)
 
 Für das Standard-Docker-Setup ist dies **nicht erforderlich** – alle Werte sind bereits in `docker-compose.yml` definiert.
