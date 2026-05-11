@@ -4,7 +4,7 @@ Ein REST-Backend-Service mit Web-Oberfläche zur Verwaltung mehrerer Einkaufslis
 
 ---
 
-## 📋 Inhaltsverzeichnis
+##  Inhaltsverzeichnis
 
 - [Übersicht](#übersicht)
 - [Verwendete Technologien](#verwendete-technologien)
@@ -25,21 +25,21 @@ Diese Anwendung stellt eine vollständige REST-API zur Verwaltung von Einkaufsli
 
 ### Funktionsumfang
 
-- ✅ Mehrere Einkaufslisten anlegen und verwalten
-- ✅ Einträge zu Listen hinzufügen, bearbeiten, löschen
-- ✅ Einträge als "erledigt" markieren (Checkbox)
-- ✅ Mengenangabe pro Eintrag
-- ✅ Responsive Web-Oberfläche (Bootstrap 5)
-- ✅ Vollständige REST-API nach Symfony-Prinzipien
-- ✅ Dockerisierte Entwicklungsumgebung
+-  Mehrere Einkaufslisten anlegen und verwalten
+-  Einträge zu Listen hinzufügen, bearbeiten, löschen
+-  Einträge als "erledigt" markieren (Checkbox)
+-  Mengenangabe pro Eintrag
+-  Responsive Web-Oberfläche (Bootstrap 5)
+-  Vollständige REST-API nach Symfony-Prinzipien
+-  Dockerisierte Entwicklungsumgebung
 
-### 🎁 Zusätzlich – über die Aufgabenstellung hinaus
+###  Zusätzlich – über die Aufgabenstellung hinaus
 
 Um die Überprüfung der Anwendung möglichst komfortabel zu gestalten, wurden folgende **Extras** ergänzt:
 
-- 📘 **Interaktive Swagger-UI Dokumentation** unter [http://localhost:8080/api-docs.html](http://localhost:8080/api-docs.html) – alle Endpunkte direkt im Browser testbar
-- 📮 **Postman-Collection** im Ordner [`postman/`](postman/) – alle 7 Endpunkte mit automatischen Tests, einfach importieren und ausführen
-- 🐳 **Docker-Setup** – ein einziger Befehl reicht zum Start, keine lokale PHP/MySQL-Installation nötig
+-  **Interaktive Swagger-UI Dokumentation** unter [http://localhost:8080/api-docs.html](http://localhost:8080/api-docs.html) – alle Endpunkte direkt im Browser testbar
+-  **Postman-Collection** im Ordner [`postman/`](postman/) – alle 7 Endpunkte mit automatischen Tests, einfach importieren und ausführen
+-  **Docker-Setup** – ein einziger Befehl reicht zum Start, keine lokale PHP/MySQL-Installation nötig
 
 ---
 
@@ -108,15 +108,15 @@ Alle drei Container (`einkaufslisten_php`, `einkaufslisten_nginx`, `einkaufslist
 
 Die Web-Oberfläche ist erreichbar unter:
 
-🔗 **<http://localhost:8080>**
+ **<http://localhost:8080>**
 
 Die REST-API ist erreichbar unter:
 
-🔗 **<http://localhost:8080/api/lists>**
+ **<http://localhost:8080/api/lists>**
 
 Die interaktive **API-Dokumentation (Swagger UI)** ist erreichbar unter:
 
-🔗 **<http://localhost:8080/api-docs.html>**
+ **<http://localhost:8080/api-docs.html>**
 
 ### Container stoppen
 
@@ -350,12 +350,12 @@ einkaufslisten-app/
 │   └── php/Dockerfile
 ├── migrations/                          # DB-Migrationen
 │   └── Version20250101000001.php
-├── postman/                             # 🎁 Bonus: Postman Collection
+├── postman/                             #  Bonus: Postman Collection
 │   └── Einkaufslisten-API.postman_collection.json
 ├── public/                              # Webroot
 │   ├── index.php
-│   ├── api-docs.html                    # 🎁 Bonus: Swagger UI
-│   └── openapi.yaml                     # 🎁 Bonus: OpenAPI-Spec
+│   ├── api-docs.html                    #  Bonus: Swagger UI
+│   └── openapi.yaml                     #  Bonus: OpenAPI-Spec
 ├── src/
 │   ├── Controller/
 │   │   ├── FrontendController.php       # HTML-Oberfläche
