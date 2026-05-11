@@ -75,8 +75,19 @@ Es ist **nicht nötig**, PHP, MySQL, Composer o.Ä. lokal zu installieren – al
 git clone <REPOSITORY-URL>
 cd einkaufslisten-app
 ```
+### 2. Umgebungsvariablen vorbereiten (optional)
 
-### 2. Container starten
+Für das Standard-Docker-Setup ist dies **nicht erforderlich** – alle Werte sind bereits in `docker-compose.yml` definiert.
+
+Falls Sie eine eigene Konfiguration verwenden möchten, kopieren Sie die Vorlage:
+
+```bash
+cp .env.example .env
+```
+
+Passen Sie anschließend die Werte in der neuen `.env` Datei an.
+
+### 3. Container starten
 
 ```bash
 docker compose up -d --build
@@ -84,7 +95,7 @@ docker compose up -d --build
 
 > Dieser Befehl baut die Container, startet MySQL, installiert die Composer-Abhängigkeiten und führt automatisch die Datenbank-Migrationen aus. Der erste Build kann 2–4 Minuten dauern.
 
-### 3. Status überprüfen
+### 4. Status überprüfen
 
 ```bash
 docker compose ps
@@ -92,7 +103,7 @@ docker compose ps
 
 Alle drei Container (`einkaufslisten_php`, `einkaufslisten_nginx`, `einkaufslisten_mysql`) sollten den Status `Up` zeigen.
 
-### 4. Anwendung aufrufen
+### 5. Anwendung aufrufen
 
 Die Web-Oberfläche ist erreichbar unter:
 
@@ -249,7 +260,7 @@ curl -X POST http://localhost:8080/api/lists/1/item \
 # Liste abrufen
 curl http://localhost:8080/api/lists/1/items
 
-# Item aktualisieren
+# Item aktualisieren 
 curl -X PUT http://localhost:8080/api/lists/1/items/1 \
   -H "Content-Type: application/json" \
   -d '{"checked":true}'
