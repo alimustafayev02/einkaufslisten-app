@@ -22,3 +22,6 @@ composer.lock
 
 # Docker
 .docker/
+ 
+# Environment Variablen 
+/.env
