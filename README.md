@@ -145,7 +145,7 @@ Die Oberfläche kommuniziert ausschließlich über die REST-API mit dem Backend.
 
 Alle Endpunkte erwarten und liefern JSON. Basis-URL: `http://localhost:8080/api`.
 
-> 💡 **Tipp für Reviewer:** Die API kann besonders bequem auf zwei Wegen getestet werden:
+>  **Tipp für Reviewer:** Die API kann besonders bequem auf zwei Wegen getestet werden:
 >
 > 1. **Swagger UI** im Browser: [http://localhost:8080/api-docs.html](http://localhost:8080/api-docs.html) – alle Endpunkte direkt ausprobieren
 > 2. **Postman-Collection** importieren – siehe Abschnitt [Postman](#postman-collection) weiter unten
