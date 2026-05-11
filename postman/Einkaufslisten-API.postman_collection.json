@@ -1,0 +1,276 @@
+{
+	"info": {
+		"name": "Einkaufslisten API",
+		"description": "Vollständige API-Collection für die Einkaufslisten-App.\n\n**Verwendung:**\n1. Stelle sicher, dass die Anwendung läuft (`docker compose up -d`)\n2. Importiere diese Collection in Postman\n3. Die Variable `baseUrl` ist standardmäßig auf `http://localhost:8080` gesetzt\n4. Führe die Requests in der angegebenen Reihenfolge aus\n\n**Alle 7 in der Aufgabenstellung geforderten Endpunkte sind enthalten:**\n- POST /lists (Liste mit X Einträgen erstellen)\n- POST /lists/:id/item (Eintrag hinzufügen)\n- GET /lists/:id/items (Liste abrufen)\n- GET /lists/:id/items/:itemId (Einzelnes Item abrufen)\n- PUT /lists/:id/items/:itemId (Item aktualisieren)\n- DELETE /lists/:id (Liste löschen)\n- DELETE /lists/:id/items/:itemId (Item löschen)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. POST /lists - Einkaufsliste erstellen",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status-Code ist 201 Created', function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test('Antwort enthält die neue Liste mit ID', function () {",
+							"    var json = pm.response.json();",
+							"    pm.expect(json).to.have.property('id');",
+							"    pm.expect(json).to.have.property('name');",
+							"    pm.expect(json).to.have.property('items');",
+							"    pm.collectionVariables.set('listId', json.id);",
+							"    if (json.items && json.items.length > 0) {",
+							"        pm.collectionVariables.set('itemId', json.items[0].id);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{ "key": "Content-Type", "value": "application/json" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Wocheneinkauf\",\n  \"items\": [\n    { \"name\": \"Milch\", \"quantity\": 2 },\n    { \"name\": \"Brot\", \"quantity\": 1 },\n    { \"name\": \"Käse\", \"quantity\": 1 }\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/lists",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "lists"]
+				},
+				"description": "Erstellt eine neue Einkaufsliste, optional mit initialen Einträgen.\n\n**Speichert automatisch:**\n- `listId` (für Folge-Requests)\n- `itemId` (für Folge-Requests)"
+			}
+		},
+		{
+			"name": "2. POST /lists/:id/item - Eintrag hinzufügen",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status-Code ist 201 Created', function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test('Antwort enthält die aktualisierte Liste', function () {",
+							"    var json = pm.response.json();",
+							"    pm.expect(json).to.have.property('items');",
+							"    pm.expect(json.items).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{ "key": "Content-Type", "value": "application/json" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Butter\",\n  \"quantity\": 1\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/lists/{{listId}}/item",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "lists", "{{listId}}", "item"]
+				},
+				"description": "Fügt einen neuen Eintrag zur angegebenen Liste hinzu.\n\n**Antwort:** Die aktualisierte komplette Einkaufsliste."
+			}
+		},
+		{
+			"name": "3. GET /lists/:id/items - Liste abrufen",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status-Code ist 200 OK', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Antwort enthält die komplette Liste mit Items', function () {",
+							"    var json = pm.response.json();",
+							"    pm.expect(json).to.have.property('id');",
+							"    pm.expect(json).to.have.property('items');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/lists/{{listId}}/items",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "lists", "{{listId}}", "items"]
+				},
+				"description": "Gibt die komplette Einkaufsliste mit allen Einträgen zurück."
+			}
+		},
+		{
+			"name": "4. GET /lists/:id/items/:itemId - Einzelnes Item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status-Code ist 200 OK', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Antwort enthält das Item', function () {",
+							"    var json = pm.response.json();",
+							"    pm.expect(json).to.have.property('id');",
+							"    pm.expect(json).to.have.property('name');",
+							"    pm.expect(json).to.have.property('quantity');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/lists/{{listId}}/items/{{itemId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "lists", "{{listId}}", "items", "{{itemId}}"]
+				},
+				"description": "Gibt ein einzelnes Item der Einkaufsliste zurück."
+			}
+		},
+		{
+			"name": "5. PUT /lists/:id/items/:itemId - Item aktualisieren",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status-Code ist 200 OK', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Item wurde aktualisiert', function () {",
+							"    var json = pm.response.json();",
+							"    pm.expect(json.name).to.eql('Vollmilch');",
+							"    pm.expect(json.quantity).to.eql(3);",
+							"    pm.expect(json.checked).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{ "key": "Content-Type", "value": "application/json" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Vollmilch\",\n  \"quantity\": 3,\n  \"checked\": true\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/lists/{{listId}}/items/{{itemId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "lists", "{{listId}}", "items", "{{itemId}}"]
+				},
+				"description": "Aktualisiert ein einzelnes Item. Alle Felder sind optional - nur übergebene Felder werden geändert.\n\n**Mögliche Felder:**\n- `name` (string)\n- `quantity` (integer, ≥ 1)\n- `checked` (boolean)"
+			}
+		},
+		{
+			"name": "7. DELETE /lists/:id/items/:itemId - Item löschen",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status-Code ist 204 No Content', function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/lists/{{listId}}/items/{{itemId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "lists", "{{listId}}", "items", "{{itemId}}"]
+				},
+				"description": "Löscht ein einzelnes Item aus der Einkaufsliste."
+			}
+		},
+		{
+			"name": "6. DELETE /lists/:id - Liste löschen",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status-Code ist 204 No Content', function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/lists/{{listId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "lists", "{{listId}}"]
+				},
+				"description": "Löscht eine komplette Einkaufsliste samt aller Einträge.\n\n⚠️ **Achtung:** Dieser Request löscht die Liste, die in den vorigen Requests verwendet wurde. Wenn du danach Requests 2-7 erneut ausführen willst, führe zuerst Request 1 nochmal aus."
+			}
+		},
+		{
+			"name": "BONUS: GET /lists - Alle Listen",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/lists",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "lists"]
+				},
+				"description": "Zusatz-Endpunkt: Listet alle vorhandenen Einkaufslisten auf.\nWird intern vom Frontend verwendet."
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "listId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "itemId",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}

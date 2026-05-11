@@ -1,0 +1,175 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ list.name }} - Einkaufsliste{% endblock %}
+
+{% block body %}
+<div class="mb-3">
+    <a href="{{ path('home') }}" class="text-decoration-none text-muted">
+        <i class="bi bi-arrow-left"></i> Zurück zur Übersicht
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="h3 mb-1">{{ list.name }}</h1>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-calendar3"></i>
+                    Erstellt am {{ list.createdAt|date('d.m.Y H:i') }}
+                </p>
+            </div>
+            <span class="badge bg-primary fs-6">
+                <span id="itemCount">{{ list.items|length }}</span> Artikel
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title mb-3">
+            <i class="bi bi-cart3 text-primary"></i> Artikel
+        </h5>
+
+        {# Neuer Artikel hinzufügen #}
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="newItemName" placeholder="Neuen Artikel hinzufügen..." onkeypress="if(event.key==='Enter') addItem()">
+            <input type="number" class="form-control" id="newItemQuantity" placeholder="Menge" value="1" min="1" style="max-width: 100px;">
+            <button class="btn btn-primary" onclick="addItem()">
+                <i class="bi bi-plus-lg"></i> Hinzufügen
+            </button>
+        </div>
+
+        {# Liste der Artikel #}
+        <div id="itemsList">
+            {% if list.items is empty %}
+                <div class="empty-state" id="emptyState">
+                    <i class="bi bi-basket"></i>
+                    <p>Noch keine Artikel. Fügen Sie oben Ihren ersten Artikel hinzu.</p>
+                </div>
+            {% else %}
+                {% for item in list.items %}
+                    <div class="list-item {% if item.checked %}checked{% endif %}" data-item-id="{{ item.id }}">
+                        <input type="checkbox" class="form-check-input" {% if item.checked %}checked{% endif %}
+                               onchange="toggleChecked({{ item.id }}, this.checked)">
+                        <span class="item-name">{{ item.name }}</span>
+                        <span class="quantity-badge">×{{ item.quantity }}</span>
+                        <button class="btn-icon" onclick="editItem({{ item.id }}, '{{ item.name|e('js') }}', {{ item.quantity }})" title="Bearbeiten">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn-icon delete" onclick="deleteItem({{ item.id }})" title="Löschen">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{# Modal: Artikel bearbeiten #}
+<div class="modal fade" id="editItemModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square text-primary"></i> Artikel bearbeiten
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editItemId">
+                <div class="mb-3">
+                    <label for="editItemName" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="editItemName">
+                </div>
+                <div class="mb-3">
+                    <label for="editItemQuantity" class="form-label">Menge</label>
+                    <input type="number" class="form-control" id="editItemQuantity" min="1">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="saveItemEdit()">
+                    <i class="bi bi-check2"></i> Speichern
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    const LIST_ID = {{ list.id }};
+
+    async function addItem() {
+        const name = document.getElementById('newItemName').value.trim();
+        const quantity = parseInt(document.getElementById('newItemQuantity').value) || 1;
+
+        if (!name) {
+            showToast('Bitte geben Sie einen Artikelnamen ein.', 'error');
+            return;
+        }
+
+        try {
+            await apiCall(`/api/lists/${LIST_ID}/item`, 'POST', { name, quantity });
+            document.getElementById('newItemName').value = '';
+            document.getElementById('newItemQuantity').value = '1';
+            showToast('Artikel hinzugefügt.', 'success');
+            setTimeout(() => window.location.reload(), 300);
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
+    }
+
+    async function toggleChecked(itemId, checked) {
+        try {
+            await apiCall(`/api/lists/${LIST_ID}/items/${itemId}`, 'PUT', { checked });
+            const row = document.querySelector(`[data-item-id="${itemId}"]`);
+            if (row) row.classList.toggle('checked', checked);
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
+    }
+
+    function editItem(id, name, quantity) {
+        document.getElementById('editItemId').value = id;
+        document.getElementById('editItemName').value = name;
+        document.getElementById('editItemQuantity').value = quantity;
+        new bootstrap.Modal(document.getElementById('editItemModal')).show();
+    }
+
+    async function saveItemEdit() {
+        const id = document.getElementById('editItemId').value;
+        const name = document.getElementById('editItemName').value.trim();
+        const quantity = parseInt(document.getElementById('editItemQuantity').value) || 1;
+
+        if (!name) {
+            showToast('Der Name darf nicht leer sein.', 'error');
+            return;
+        }
+
+        try {
+            await apiCall(`/api/lists/${LIST_ID}/items/${id}`, 'PUT', { name, quantity });
+            bootstrap.Modal.getInstance(document.getElementById('editItemModal')).hide();
+            showToast('Artikel aktualisiert.', 'success');
+            setTimeout(() => window.location.reload(), 300);
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
+    }
+
+    async function deleteItem(itemId) {
+        if (!confirm('Möchten Sie diesen Artikel wirklich löschen?')) return;
+        try {
+            await apiCall(`/api/lists/${LIST_ID}/items/${itemId}`, 'DELETE');
+            showToast('Artikel gelöscht.', 'success');
+            setTimeout(() => window.location.reload(), 300);
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
+    }
+</script>
+{% endblock %}

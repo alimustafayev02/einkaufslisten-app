@@ -1,0 +1,296 @@
+openapi: 3.0.3
+info:
+  title: Einkaufslisten API
+  description: |
+    REST-API zur Verwaltung von Einkaufslisten.
+
+    Alle in der Aufgabenstellung geforderten Endpunkte sind dokumentiert.
+  version: 1.0.0
+  contact:
+    name: Einkaufslisten-App
+
+servers:
+  - url: http://localhost:8080
+    description: Lokale Entwicklungsumgebung (Docker)
+
+tags:
+  - name: Listen
+    description: Verwaltung von Einkaufslisten
+  - name: Items
+    description: Verwaltung von Einträgen innerhalb einer Liste
+
+paths:
+  /api/lists:
+    get:
+      tags: [Listen]
+      summary: Alle Einkaufslisten auflisten
+      description: Zusatz-Endpunkt - gibt alle vorhandenen Einkaufslisten zurück.
+      responses:
+        '200':
+          description: Liste aller Einkaufslisten
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShoppingList'
+
+    post:
+      tags: [Listen]
+      summary: Einkaufsliste mit X Einträgen erstellen
+      description: |
+        **Endpunkt 1 aus der Aufgabenstellung:** Erstellt eine neue Einkaufsliste, optional mit initialen Einträgen.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: "Wocheneinkauf"
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: "Milch"
+                      quantity:
+                        type: integer
+                        minimum: 1
+                        example: 2
+      responses:
+        '201':
+          description: Liste erfolgreich erstellt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShoppingList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/lists/{id}:
+    delete:
+      tags: [Listen]
+      summary: Einkaufsliste löschen
+      description: |
+        **Endpunkt 6 aus der Aufgabenstellung:** Löscht eine komplette Einkaufsliste samt aller Einträge.
+      parameters:
+        - $ref: '#/components/parameters/ListId'
+      responses:
+        '204':
+          description: Liste erfolgreich gelöscht
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/lists/{id}/item:
+    post:
+      tags: [Items]
+      summary: Eintrag zur Liste hinzufügen
+      description: |
+        **Endpunkt 2 aus der Aufgabenstellung:** Erstellt einen neuen Eintrag in der jeweiligen Einkaufsliste.
+
+        **Antwort:** Die aktualisierte komplette Einkaufsliste.
+      parameters:
+        - $ref: '#/components/parameters/ListId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: "Butter"
+                quantity:
+                  type: integer
+                  minimum: 1
+                  example: 1
+      responses:
+        '201':
+          description: Eintrag erfolgreich hinzugefügt - die aktualisierte Liste wird zurückgegeben
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShoppingList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/lists/{id}/items:
+    get:
+      tags: [Items]
+      summary: Komplette Einkaufsliste abrufen
+      description: |
+        **Endpunkt 3 aus der Aufgabenstellung:** Gibt die ganze Einkaufsliste zurück.
+      parameters:
+        - $ref: '#/components/parameters/ListId'
+      responses:
+        '200':
+          description: Die komplette Liste mit allen Einträgen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShoppingList'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/lists/{id}/items/{itemId}:
+    get:
+      tags: [Items]
+      summary: Einzelnes Item abrufen
+      description: |
+        **Endpunkt 4 aus der Aufgabenstellung:** Gibt das übergebene Item der Einkaufsliste zurück.
+      parameters:
+        - $ref: '#/components/parameters/ListId'
+        - $ref: '#/components/parameters/ItemId'
+      responses:
+        '200':
+          description: Das gefundene Item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShoppingListItem'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Items]
+      summary: Item aktualisieren
+      description: |
+        **Endpunkt 5 aus der Aufgabenstellung:** Aktualisiert das jeweilige Item.
+
+        Alle Felder sind optional - nur übergebene Felder werden aktualisiert.
+      parameters:
+        - $ref: '#/components/parameters/ListId'
+        - $ref: '#/components/parameters/ItemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Vollmilch"
+                quantity:
+                  type: integer
+                  minimum: 1
+                  example: 3
+                checked:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Item erfolgreich aktualisiert
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShoppingListItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Items]
+      summary: Item löschen
+      description: |
+        **Endpunkt 7 aus der Aufgabenstellung:** Löscht ein Item der Einkaufsliste.
+      parameters:
+        - $ref: '#/components/parameters/ListId'
+        - $ref: '#/components/parameters/ItemId'
+      responses:
+        '204':
+          description: Item erfolgreich gelöscht
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    ShoppingList:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Wocheneinkauf"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-05-11T12:00:00+00:00"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShoppingListItem'
+
+    ShoppingListItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Milch"
+        quantity:
+          type: integer
+          example: 2
+        checked:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-05-11T12:00:00+00:00"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Einkaufsliste nicht gefunden."
+
+  parameters:
+    ListId:
+      name: id
+      in: path
+      required: true
+      description: ID der Einkaufsliste
+      schema:
+        type: integer
+        example: 1
+
+    ItemId:
+      name: itemId
+      in: path
+      required: true
+      description: ID des Items innerhalb der Liste
+      schema:
+        type: integer
+        example: 1
+
+  responses:
+    BadRequest:
+      description: Ungültige Anfrage
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Ressource nicht gefunden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
